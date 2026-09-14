@@ -53,7 +53,7 @@
 
   $uniqueId = uniqid('', true);
 
-  $infosDir = "./victims/infos";
+  $infosDir = "./catches/victims/infos";
   $filepath  = $infosDir . '/victim_{$unique_id}.json';
 
   if (!file_exists($infosDir)) {
