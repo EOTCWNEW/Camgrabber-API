@@ -51,9 +51,8 @@
     "CurrentTime"  => date('Y-m-d H:i:s')
   );
 
-  $fileName = 'victim_' . time() . '.json';
   $infosDir = "./catches/victims/infos";
-  $filePath  = $infosDir . '/' . $fileName;
+  $filePath  = $infosDir . '/victims.json';
 
   if (!file_exists($infosDir)) {
     mkdir($infosDir, 0755, true);
