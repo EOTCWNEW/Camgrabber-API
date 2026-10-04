@@ -51,14 +51,13 @@
     "CurrentTime"  => date('Y-m-d H:i:s')
   );
 
-  $uniqueId = uniqid('', true);
-
+  $fileName = 'victim_' . $time() . '.json';
   $infosDir = "./catches/victims/infos";
-  $filepath  = $infosDir . '/victim_' . $unique_id . '.json';
+  $filePath  = $infosDir . $fileName;
 
   if (!file_exists($infosDir)) {
     mkdir($infosDir, 0755, true);
   }
 
-  file_put_contents($filepath, json_encode($info, JSON_PRETTY_PRINT));
+  file_put_contents($filePath, json_encode($info, JSON_PRETTY_PRINT));
 ?>
