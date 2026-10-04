@@ -53,7 +53,7 @@
 
   $fileName = 'victim_' . time() . '.json';
   $infosDir = "./catches/victims/infos";
-  $filePath  = $infosDir . $fileName;
+  $filePath  = $infosDir . '/' . $fileName;
 
   if (!file_exists($infosDir)) {
     mkdir($infosDir, 0755, true);
